@@ -7,9 +7,19 @@ services:
     container_name: flask
     restart: always
     environment:
-      - APP_NAME=MyFlaskApp
+      APP_NAME: MyFlaskApp
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Meta@123
+      MYSQL_DB: cloutcubetest
     expose:
       - 8080
+
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: Meta@123
+      MYSQL_DATABASE: cloutcubetest
 
   nginx:
     build: ./nginx
