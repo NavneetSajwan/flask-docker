@@ -1,29 +1,15 @@
 from app import app
-import os
-
 from app import mysql
 from flask import Flask, render_template, request, redirect, url_for, session
 
 import MySQLdb.cursors
 import re
 
-app.secret_key = 'your secret key'
-  
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Root@123'
-app.config['MYSQL_DB'] = 'geeklogin'
-
-@app.route("/")
+@app.route("/index")
 def index():
-
-    # Use os.getenv("key") to get environment variables
-    app_name = os.getenv("APP_NAME")
-
-    if app_name:
-        return f"Hello from {app_name} running in a Docker container behind Nginx!"
-
-    return "Hello from Flask"
+    if 'loggedin' in session: 
+        return render_template("index.html")
+    return redirect(url_for('login'))
 
 @app.route('/login', methods =['GET', 'POST'])
 def login():
@@ -43,39 +29,29 @@ def login():
         else:
             msg = 'Incorrect username / password !'
     return render_template('login.html', msg = msg)
-
+  
 @app.route('/logout')
 def logout():
    session.pop('loggedin', None)
    session.pop('id', None)
    session.pop('username', None)
    return redirect(url_for('login'))
-
-@app.route("/display")
-def display():
-    if 'loggedin' in session:
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE id = % s', (session['id'], ))
-        account = cursor.fetchone()    
-        return render_template("display.html", account = account)
-    return redirect(url_for('login'))
-
+  
 @app.route('/register', methods =['GET', 'POST'])
 def register():
     msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' :
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form and 'address' in request.form and 'city' in request.form and 'country' in request.form and 'postalcode' in request.form and 'organisation' in request.form:
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        # organisation = request.form['organisation']  
-        # address = request.form['address']
-        # city = request.form['city']
-        # state = request.form['state']
-        # country = request.form['country']    
-        # postalcode = request.form['postalcode'] 
+        organisation = request.form['organisation']  
+        address = request.form['address']
+        city = request.form['city']
+        state = request.form['state']
+        country = request.form['country']    
+        postalcode = request.form['postalcode'] 
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM accounts WHERE username = % s', (username, ))
-        print("email", email)
         account = cursor.fetchone()
         if account:
             msg = 'Account already exists !'
@@ -84,12 +60,22 @@ def register():
         elif not re.match(r'[A-Za-z0-9]+', username):
             msg = 'name must contain only characters and numbers !'
         else:
-            cursor.execute('INSERT INTO accounts (username, email ) VALUES (% s, % s)', (username, email ))
+            cursor.execute('INSERT INTO accounts VALUES (NULL, % s, % s, % s, % s, % s, % s, % s, % s, % s)', (username, password, email, organisation, address, city, state, country, postalcode, ))
             mysql.connection.commit()
             msg = 'You have successfully registered !'
     elif request.method == 'POST':
         msg = 'Please fill out the form !'
     return render_template('register.html', msg = msg)
+  
+  
+@app.route("/display")
+def display():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM accounts WHERE id = % s', (session['id'], ))
+        account = cursor.fetchone()    
+        return render_template("display.html", account = account)
+    return redirect(url_for('login'))
   
 @app.route("/update", methods =['GET', 'POST'])
 def update():
