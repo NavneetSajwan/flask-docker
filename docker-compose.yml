@@ -11,15 +11,18 @@ services:
       MYSQL_HOST: mysql
       MYSQL_USER: root
       MYSQL_PASSWORD: Meta@123
-      MYSQL_DB: cloutcubetest
+      MYSQL_DB: geeklogin
     expose:
       - 8080
 
   mysql:
-    image: mysql:latest
+    image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: Meta@123
-      MYSQL_DATABASE: cloutcubetest
+      MYSQL_DATABASE: geeklogin
+    volumes:
+      - mysqldir:/var/lib/mysql
+      - dump:/docker-entrypoint-initdb.d
 
   nginx:
     build: ./nginx
@@ -27,3 +30,7 @@ services:
     restart: always
     ports:
       - "80:80"
+
+volumes:
+  mysqldir:
+  dump:

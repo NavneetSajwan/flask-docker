@@ -9,10 +9,15 @@ import re
 
 app.secret_key = 'your secret key'
   
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Root@123'
-app.config['MYSQL_DB'] = 'geeklogin'
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = 'Root@123'
+# app.config['MYSQL_DB'] = 'geeklogin'
+
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')
 
 @app.route("/")
 def index():
@@ -63,6 +68,7 @@ def display():
 @app.route('/register', methods =['GET', 'POST'])
 def register():
     msg = ''
+    print(os.environ.get('MYSQL_PASSWORD'))
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' :
         username = request.form['username']
         password = request.form['password']
