@@ -10,7 +10,7 @@ services:
       APP_NAME: MyFlaskApp
       MYSQL_HOST: mysql
       MYSQL_USER: root
-      MYSQL_PASSWORD: Meta@123
+      MYSQL_PASSWORD: password
       MYSQL_DB: geeklogin
     expose:
       - 8080
@@ -18,7 +18,7 @@ services:
   mysql:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: Meta@123
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: geeklogin
     volumes:
       - mysqldir:/var/lib/mysql
